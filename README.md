@@ -7,7 +7,8 @@
 
 SnipLink is a modern, AI-powered bookmark manager that automatically generates summaries for your saved links, making it easy to organize and rediscover your content. Built with Next.js 15, Supabase, and featuring a beautiful glass-morphism UI.
 
-![SnipLink Preview](preview.png)
+![SnipLink Preview](https://sniplink-v1.vercel.app/preview.png)
+
 
 ## ✨ Features
 
