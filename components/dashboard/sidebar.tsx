@@ -145,7 +145,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           })}
         </nav>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle */}      
         <div className="px-4 pb-4 flex-shrink-0">
           <Button
             variant="outline"
@@ -153,8 +153,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="w-full flex items-center gap-3 justify-start h-10"
           >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 ml-0.5" />
+            {/* Show moon icon when switching to dark, sun when switching to light */}
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+
+            {/* Label text */}
             <span className="ml-6 lg:ml-7">
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </span>
