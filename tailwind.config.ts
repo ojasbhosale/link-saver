@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss'
 import animate from 'tailwindcss-animate'
+import plugin from 'tailwindcss/plugin'
 
 const config: Config = {
   darkMode: ['class'],
@@ -90,7 +91,7 @@ const config: Config = {
   plugins: [
     animate,
     // Custom plugin for glass morphism
-    function({ addUtilities }) {
+    plugin(function ({ addUtilities }) {
       const newUtilities = {
         '.glass': {
           background: 'rgba(255, 255, 255, 0.1)',
@@ -104,7 +105,7 @@ const config: Config = {
         },
       }
       addUtilities(newUtilities)
-    }
+    })
   ],
 }
 

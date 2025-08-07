@@ -128,6 +128,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder, onBookmarksUpdate
     try {
       await onReorder(updatedLocalBookmarks)
     } catch (error) {
+      console.error('Error reordering bookmarks:', error)
       // Revert on error
       setLocalBookmarks([...bookmarks])
       filterAndSortBookmarks()
@@ -208,7 +209,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder, onBookmarksUpdate
 
         {isDragDisabled && (
           <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-lg">
-            💡 Switch to "Position" sorting to enable drag & drop reordering
+            💡 Switch to &quot;Position&quot; sorting to enable drag &amp; drop reordering
           </div>
         )}
 

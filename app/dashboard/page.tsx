@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 
 import { useState, useEffect, useCallback } from 'react'
 import { BookmarkModal } from '@/components/dashboard/bookmark-modal'
@@ -238,17 +239,22 @@ export default function Dashboard() {
                 >
                   <div className="flex items-start gap-4">
                     {bookmark.favicon_url && (
-                      <div className="flex-shrink-0 mt-1">
-                        <img
-                          src={bookmark.favicon_url || "/placeholder.svg"}
-                          alt=""
-                          className="w-6 h-6 rounded-lg shadow-sm"
+                      <div className="relative w-4 h-4 flex-shrink-0 mt-0.5 rounded overflow-hidden">
+                        <Image
+                          src={bookmark.favicon_url}
+                          alt="Favicon"
+                          fill
+                          sizes="16px"
+                          className="object-contain"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none'
+                            const target = e.currentTarget as HTMLImageElement
+                            target.src = '/placeholder.svg'
                           }}
+                          unoptimized // Important for external URLs!
                         />
                       </div>
                     )}
+
                     <div className="flex-1 min-w-0 space-y-3">
                       <div>
                         <h4 className="font-semibold text-foreground line-clamp-1 mb-2 text-lg">

@@ -38,11 +38,12 @@ export function LoginForm() {
           description: 'Welcome to SnipLink. You can now start saving your links.',
         })
       }
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      const err = error as { message: string }
+      setError(err.message)
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive',
       })
     } finally {
@@ -69,11 +70,12 @@ export function LoginForm() {
           description: 'You have been signed in successfully.',
         })
       }
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      const err = error as { message: string }
+      setError(err.message)
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive',
       })
     } finally {
@@ -86,7 +88,7 @@ export function LoginForm() {
     setError('')
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -100,11 +102,12 @@ export function LoginForm() {
       if (error) throw error
 
       // The redirect will happen automatically
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      const err = error as { message: string }
+      setError(err.message)
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive',
       })
       setIsLoading(false)

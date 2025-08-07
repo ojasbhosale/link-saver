@@ -1,5 +1,5 @@
 'use client'
-
+import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -227,14 +227,20 @@ export default function SummariesPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2 flex-1 min-w-0">
                     {bookmark.favicon_url && (
-                      <img
-                        src={bookmark.favicon_url || "/placeholder.svg"}
-                        alt=""
-                        className="w-4 h-4 flex-shrink-0 mt-0.5 rounded"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                        }}
-                      />
+                      <div className="relative w-4 h-4 flex-shrink-0 mt-0.5 rounded overflow-hidden">
+                        <Image
+                          src={bookmark.favicon_url}
+                          alt="Favicon"
+                          fill
+                          sizes="16px"
+                          className="object-contain"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement
+                            target.src = '/placeholder.svg'
+                          }}
+                          unoptimized // Important for external URLs!
+                        />
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-1">

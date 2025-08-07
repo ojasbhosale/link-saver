@@ -6,7 +6,7 @@ import { BookmarkCard } from './bookmark-card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Search, X, Filter, SortAsc, SortDesc, Bookmark } from 'lucide-react'
+import { Search, X, Filter, SortAsc, SortDesc, Bookmark as BookmarkIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -116,6 +116,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
     try {
       await onReorder(updatedOriginalBookmarks)
     } catch (error) {
+      console.error('Error updating bookmarks:', error)
       // Revert on error
       filterAndSortBookmarks()
     }
@@ -233,7 +234,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
           <div className="glass-card premium-shadow border-0 rounded-2xl p-8 max-w-md mx-auto">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-muted/50 rounded-2xl mb-6">
               {bookmarks.length === 0 ? (
-                <Bookmark className="h-8 w-8 text-muted-foreground" />
+                <BookmarkIcon className="h-8 w-8 text-muted-foreground" />
               ) : (
                 <Search className="h-8 w-8 text-muted-foreground" />
               )}

@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -56,16 +57,19 @@ export function BookmarkCard({ bookmark, onDelete, isDragging = false, isDragDis
           )}
           
           {bookmark.favicon_url && (
-            <img
-              src={bookmark.favicon_url || "/placeholder.svg"}
-              alt=""
+            <Image
+              src={bookmark.favicon_url}
+              alt="Favicon"
+              width={16}
+              height={16}
+              unoptimized
               className="w-4 h-4 flex-shrink-0 mt-1 rounded"
               onError={(e) => {
-                e.currentTarget.style.display = 'none'
+                const target = e.currentTarget as HTMLImageElement
+                target.src = '/placeholder.svg'
               }}
             />
           )}
-          
           <div className="flex-1 min-w-0 space-y-3">
             <div>
               <h3 className="font-semibold text-slate-900 dark:text-slate-100 leading-tight line-clamp-2 mb-1 text-sm">

@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -55,17 +56,22 @@ export function BookmarkCard({ bookmark, onDelete, isDragging = false }: Bookmar
               <GripVertical className="h-4 w-4" />
             </div>
             {bookmark.favicon_url && (
-              <div className="flex-shrink-0 w-5 h-5 rounded overflow-hidden bg-muted/20">
-                <img
-                  src={bookmark.favicon_url || "/placeholder.svg"}
-                  alt=""
-                  className="w-full h-full object-cover"
+              <div className="relative w-4 h-4 flex-shrink-0 mt-0.5 rounded overflow-hidden">
+                <Image
+                  src={bookmark.favicon_url}
+                  alt="Favicon"
+                  fill
+                  sizes="16px"
+                  className="object-contain"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none'
+                    const target = e.currentTarget as HTMLImageElement
+                    target.src = '/placeholder.svg'
                   }}
+                  unoptimized // Important for external URLs!
                 />
               </div>
             )}
+
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground leading-tight truncate mb-1">
                 {bookmark.title}

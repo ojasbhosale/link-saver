@@ -22,6 +22,7 @@ export async function GET() {
 
     return NextResponse.json(bookmarks)
   } catch (error) {
+    console.error('GET /api/bookmarks error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -54,8 +55,7 @@ export async function POST(request: NextRequest) {
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; LinkSaver/1.0)',
-        },
-        timeout: 10000,
+        }
       })
       
       if (response.ok) {
@@ -89,8 +89,7 @@ export async function POST(request: NextRequest) {
             headers: {
               'Accept': 'text/plain',
               'User-Agent': 'LinkSaver/1.0',
-            },
-            timeout: 15000,
+            }
           })
           
           if (jinaResponse.ok) {
