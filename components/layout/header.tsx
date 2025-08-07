@@ -2,124 +2,97 @@
 
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
-import { useTheme } from 'next-themes'
-import { Moon, Sun, LogOut, User, Bookmark, Settings } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Menu, Zap } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useToast } from '@/hooks/use-toast'
 
-export function Header() {
-  const { user, signOut, loading } = useAuth()
-  const { theme, setTheme } = useTheme()
-  const { toast } = useToast()
+interface HeaderProps {
+  onMenuClick: () => void
+}
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      toast({
-        title: 'Signed out',
-        description: 'You have been signed out successfully.',
-      })
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      })
-    }
-  }
+export function Header({ onMenuClick }: HeaderProps) {
+  const { user, loading } = useAuth()
 
   const getUserInitials = (email: string) => {
     return email.split('@')[0].slice(0, 2).toUpperCase()
   }
 
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+    }
+    if (user?.email) {
+      return user.email.split('@')[0]
+    }
+    return 'User'
+  }
+
   if (loading) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Bookmark className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-bold">Link Saver</h1>
-            </div>
+            <div className="w-8 h-8 bg-muted animate-pulse rounded-md lg:hidden"></div>
+            <div className="w-32 h-6 bg-muted animate-pulse rounded"></div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-muted animate-pulse rounded-full"></div>
-          </div>
+          <div className="w-8 h-8 bg-muted animate-pulse rounded-full"></div>
         </div>
       </header>
     )
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-sm rounded-lg"></div>
-              <div className="relative bg-primary/10 p-1.5 rounded-lg">
-                <Bookmark className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Link Saver
-            </h1>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Left side - Mobile menu button and welcome message */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Mobile menu button - only visible on small screens */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="relative"
+            onClick={onMenuClick}
+            className="lg:hidden p-2 hover:bg-accent rounded-md"
+            aria-label="Open sidebar"
           >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
+            <Menu className="h-5 w-5" />
           </Button>
+          
+          {/* Welcome message - responsive text */}
+          <div className="min-w-0">
+            <p className="text-sm sm:text-base font-medium text-foreground truncate">
+              <Zap className="h-4 w-4 inline-block mr-1" />
+              <span className="hidden sm:inline">Welcome back, </span>
+              <span className="text-primary">
+                {getUserDisplayName()}
+              </span>
+              <span className="hidden sm:inline">! 👋</span>
+            </p>
+          </div>
+        </div>
 
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url || "/placeholder.svg"} alt={user.email} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                      {getUserInitials(user.email || 'U')}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.user_metadata?.full_name || 'User'}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem disabled>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+        {/* Right side - User avatar */}
+        <div className="flex items-center">
+          <div className="flex items-center space-x-3">
+            {/* User name - hidden on small screens, shown on larger screens */}
+            <div className="hidden md:block text-right">
+              <p className="text-sm font-medium text-foreground">
+                {getUserDisplayName()}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {user?.email}
+              </p>
+            </div>
+            
+            {/* Avatar */}
+            <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-primary/10 hover:ring-primary/20 transition-all">
+              <AvatarImage 
+                src={user?.user_metadata?.avatar_url || "/placeholder.svg"} 
+                alt={getUserDisplayName()} 
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-xs sm:text-sm">
+                {user?.email ? getUserInitials(user.email) : 'U'}
+              </AvatarFallback>
+            </Avatar>
+          </div>
         </div>
       </div>
     </header>

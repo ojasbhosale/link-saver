@@ -16,23 +16,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid bookmarks data' }, { status: 400 })
     }
 
-    // Update positions for all bookmarks
-    const updates = bookmarks.map((bookmark, index) => ({
-      id: bookmark.id,
-      position: index,
-    }))
-
-    for (const update of updates) {
-      await supabase
+    // Use a transaction to update all positions atomically
+    const updates = bookmarks.map((bookmark, index) => 
+      supabase
         .from('bookmarks')
-        .update({ position: update.position })
-        .eq('id', update.id)
+        .update({ position: index })
+        .eq('id', bookmark.id)
         .eq('user_id', user.id)
+    )
+
+    // Execute all updates
+    const results = await Promise.all(updates)
+    
+    // Check if any update failed
+    const hasError = results.some(result => result.error)
+    if (hasError) {
+      console.error('Some updates failed:', results.filter(r => r.error))
+      return NextResponse.json({ error: 'Failed to update some bookmarks' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error reordering bookmarks:', error)
+    console.error('Reorder error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

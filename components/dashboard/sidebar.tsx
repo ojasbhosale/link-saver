@@ -1,12 +1,22 @@
 'use client'
 
-import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useToast } from '@/hooks/use-toast'
-import { LayoutDashboard, Bookmark, FileText, LogOut, Menu, X, LinkIcon, Sparkles } from 'lucide-react'
+import { 
+  Link as LinkIcon, 
+  LayoutDashboard, 
+  Bookmark, 
+  FileText, 
+  LogOut, 
+  X, 
+  Sparkles,
+  Moon,
+  Sun
+} from 'lucide-react'
+import { useTheme } from 'next-themes'
 
 const navigation = [
   {
@@ -26,12 +36,17 @@ const navigation = [
   },
 ]
 
-export function Sidebar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+interface SidebarProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function Sidebar({ open, onClose }: SidebarProps) {
   const { user, signOut } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const { toast } = useToast()
+  const { theme, setTheme } = useTheme()
 
   const handleSignOut = async () => {
     try {
@@ -55,56 +70,54 @@ export function Sidebar() {
 
   const handleNavigation = (href: string) => {
     router.push(href)
-    setIsMobileMenuOpen(false)
+    onClose() // Close mobile sidebar after navigation
   }
 
   return (
     <>
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
-        >
-          {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {/* Mobile overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 
-        transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-        flex flex-col h-screen
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 h-screen 
+        bg-background/95 backdrop-blur-xl border-r border-border/50
+        flex flex-col overflow-hidden premium-shadow
+        transform transition-transform duration-300 ease-out
+        lg:relative lg:translate-x-0 lg:z-30
+        ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-xl">
-            <LinkIcon className="h-5 w-5 text-white" />
+        {/* Header with close button */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 flex-shrink-0 h-16 lg:h-20">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+              <div className="relative bg-primary p-2.5 rounded-xl shadow-lg">
+                <LinkIcon className="h-5 w-5 lg:h-6 lg:w-6 text-primary-foreground" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-lg lg:text-xl font-bold text-foreground">
+                SnipLink
+              </h1>
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-primary" />
+                AI-Powered
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              Link Saver
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              AI-Powered
-            </p>
-          </div>
+          
+          {/* Close button - only visible on mobile */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="lg:hidden p-2 hover:bg-accent rounded-md"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -112,48 +125,74 @@ export function Sidebar() {
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
                 className={`
-                  w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl 
+                  transition-all duration-200 group relative overflow-hidden
                   ${isActive
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   }
                 `}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-slate-500 dark:text-slate-400"}`} />
-                {item.name}
+                <item.icon className={`h-5 w-5 transition-transform duration-200 ${
+                  isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground group-hover:scale-110"
+                }`} />
+                <span className="font-medium">{item.name}</span>
+                {isActive && (
+                  <div className="absolute right-2 w-2 h-2 bg-primary-foreground rounded-full animate-pulse" />
+                )}
               </button>
             )
           })}
         </nav>
 
+        {/* Theme Toggle */}
+        <div className="px-4 pb-4 flex-shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="w-full flex items-center gap-3 justify-start h-10"
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 ml-0.5" />
+            <span className="ml-6 lg:ml-7">
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </span>
+          </Button>
+        </div>
+
         {/* User Profile */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.user_metadata?.avatar_url || "/placeholder.svg"} alt={user?.email} />
-              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium text-sm">
+        <div className="p-4 border-t border-border/50 flex-shrink-0 space-y-3">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-accent/30 border border-border/30">
+            <Avatar className="h-9 w-9 ring-2 ring-primary/20">
+              <AvatarImage 
+                src={user?.user_metadata?.avatar_url || "/placeholder.svg"} 
+                alt={user?.email} 
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
                 {user?.email ? getUserInitials(user.email) : 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+              <p className="text-sm font-semibold text-foreground truncate">
                 {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {user?.email}
               </p>
             </div>
           </div>
+          
           <Button
             variant="ghost"
             onClick={handleSignOut}
-            className="w-full justify-start text-sm text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 h-9"
+            className="w-full justify-start text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-10 group transition-all duration-200"
           >
-            <LogOut className="h-4 w-4 mr-2" />
+            <LogOut className="h-4 w-4 mr-3 group-hover:scale-110 transition-transform duration-200" />
             Sign Out
           </Button>
         </div>
-      </div>
+      </aside>
     </>
   )
 }

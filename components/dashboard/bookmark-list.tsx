@@ -20,24 +20,31 @@ interface BookmarkListProps {
   bookmarks: Bookmark[]
   onDelete: (id: string) => Promise<void>
   onReorder: (bookmarks: Bookmark[]) => Promise<void>
+  onBookmarksUpdate: (bookmarks: Bookmark[]) => void
 }
 
-type SortOption = 'newest' | 'oldest' | 'title' | 'url'
+type SortOption = 'position' | 'newest' | 'oldest' | 'title' | 'url'
 
-export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListProps) {
+export function BookmarkList({ bookmarks, onDelete, onReorder, onBookmarksUpdate }: BookmarkListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
+  const [sortBy, setSortBy] = useState<SortOption>('position')
   const [filteredBookmarks, setFilteredBookmarks] = useState<Bookmark[]>([])
+  const [localBookmarks, setLocalBookmarks] = useState<Bookmark[]>([])
+
+  // Update local bookmarks when props change
+  useEffect(() => {
+    setLocalBookmarks([...bookmarks])
+  }, [bookmarks])
 
   // Get all unique tags
   const allTags = Array.from(
-    new Set(bookmarks.flatMap(bookmark => bookmark.tags))
+    new Set(localBookmarks.flatMap(bookmark => bookmark.tags))
   ).sort()
 
   // Filter and sort bookmarks
   const filterAndSortBookmarks = useCallback(() => {
-    let filtered = [...bookmarks]
+    let filtered = [...localBookmarks]
 
     // Apply search filter
     if (searchTerm) {
@@ -58,6 +65,8 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
+        case 'position':
+          return a.position - b.position
         case 'newest':
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         case 'oldest':
@@ -72,7 +81,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
     })
 
     setFilteredBookmarks(filtered)
-  }, [bookmarks, searchTerm, selectedTags, sortBy])
+  }, [localBookmarks, searchTerm, selectedTags, sortBy])
 
   useEffect(() => {
     filterAndSortBookmarks()
@@ -92,20 +101,37 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
   }
 
   const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination) return
+    if (!result.destination || sortBy !== 'position') return
 
     const items = Array.from(filteredBookmarks)
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
 
-    // Update positions
-    const updatedBookmarks = items.map((bookmark, index) => ({
+    // Update positions based on the new order
+    const updatedItems = items.map((bookmark, index) => ({
       ...bookmark,
       position: index
     }))
 
-    setFilteredBookmarks(updatedBookmarks)
-    await onReorder(updatedBookmarks)
+    // Update filtered bookmarks immediately
+    setFilteredBookmarks(updatedItems)
+
+    // Update local bookmarks
+    const updatedLocalBookmarks = localBookmarks.map(bookmark => {
+      const updatedBookmark = updatedItems.find(item => item.id === bookmark.id)
+      return updatedBookmark || bookmark
+    })
+    
+    setLocalBookmarks(updatedLocalBookmarks)
+    onBookmarksUpdate(updatedLocalBookmarks)
+
+    try {
+      await onReorder(updatedLocalBookmarks)
+    } catch (error) {
+      // Revert on error
+      setLocalBookmarks([...bookmarks])
+      filterAndSortBookmarks()
+    }
   }
 
   const getSortIcon = () => {
@@ -114,6 +140,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
 
   const getSortLabel = () => {
     switch (sortBy) {
+      case 'position': return 'Position'
       case 'newest': return 'Newest first'
       case 'oldest': return 'Oldest first'
       case 'title': return 'Title A-Z'
@@ -122,8 +149,10 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
     }
   }
 
+  const isDragDisabled = sortBy !== 'position'
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Search and Filters */}
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row gap-2">
@@ -133,19 +162,22 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
               placeholder="Search bookmarks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+              className="pl-10 h-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-sm"
             />
           </div>
           
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-10 px-3">
+                <Button variant="outline" className="h-9 px-3 text-sm">
                   {getSortIcon()}
-                  <span className="ml-2 hidden sm:inline text-sm">{getSortLabel()}</span>
+                  <span className="ml-2 hidden sm:inline">{getSortLabel()}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setSortBy('position')}>
+                  Position (Drag to reorder)
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy('newest')}>
                   Newest first
                 </DropdownMenuItem>
@@ -165,14 +197,20 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
               <Button
                 variant="outline"
                 onClick={clearFilters}
-                className="h-10 px-3"
+                className="h-9 px-3 text-sm"
               >
                 <X className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline text-sm">Clear</span>
+                <span className="hidden sm:inline">Clear</span>
               </Button>
             )}
           </div>
         </div>
+
+        {isDragDisabled && (
+          <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-lg">
+            💡 Switch to "Position" sorting to enable drag & drop reordering
+          </div>
+        )}
 
         {allTags.length > 0 && (
           <div className="space-y-2">
@@ -186,7 +224,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
                   key={tag}
                   variant={selectedTags.includes(tag) ? "default" : "outline"}
                   className={cn(
-                    "cursor-pointer transition-all duration-200 hover:scale-105 text-xs",
+                    "cursor-pointer transition-all duration-200 hover:scale-105 text-xs px-2 py-0.5",
                     selectedTags.includes(tag)
                       ? "bg-blue-500 hover:bg-blue-600 text-white"
                       : "hover:bg-blue-50 dark:hover:bg-blue-950/20 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-700"
@@ -207,22 +245,22 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
       {/* Results count */}
       {(searchTerm || selectedTags.length > 0) && (
         <div className="text-sm text-slate-500 dark:text-slate-400">
-          Showing {filteredBookmarks.length} of {bookmarks.length} bookmarks
+          Showing {filteredBookmarks.length} of {localBookmarks.length} bookmarks
         </div>
       )}
 
       {/* Bookmarks List */}
       {filteredBookmarks.length === 0 ? (
-        <div className="text-center py-8">
+        <div className="text-center py-6">
           <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 max-w-md mx-auto">
             <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
               <Search className="h-6 w-6 text-slate-400" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">
-              {bookmarks.length === 0 ? 'No bookmarks yet' : 'No results found'}
+            <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 mb-2">
+              {localBookmarks.length === 0 ? 'No bookmarks yet' : 'No results found'}
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {bookmarks.length === 0 
+              {localBookmarks.length === 0 
                 ? 'Add your first bookmark to get started with AI-powered summaries!'
                 : 'Try adjusting your search or filters to find what you\'re looking for.'
               }
@@ -231,18 +269,19 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
         </div>
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="bookmarks">
+          <Droppable droppableId="bookmarks" isDropDisabled={isDragDisabled}>
             {(provided) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="space-y-3"
+                className="space-y-2"
               >
                 {filteredBookmarks.map((bookmark, index) => (
                   <Draggable
-                    key={`${bookmark.id}-${bookmark.position}`}
+                    key={bookmark.id}
                     draggableId={bookmark.id}
                     index={index}
+                    isDragDisabled={isDragDisabled}
                   >
                     {(provided, snapshot) => (
                       <div
@@ -254,6 +293,7 @@ export function BookmarkList({ bookmarks, onDelete, onReorder }: BookmarkListPro
                           bookmark={bookmark}
                           onDelete={onDelete}
                           isDragging={snapshot.isDragging}
+                          isDragDisabled={isDragDisabled}
                         />
                       </div>
                     )}

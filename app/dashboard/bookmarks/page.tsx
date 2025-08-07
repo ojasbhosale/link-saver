@@ -102,27 +102,35 @@ export default function BookmarksPage() {
         throw new Error('Failed to reorder bookmarks')
       }
 
+      // Success - update the main state
       setBookmarks(reorderedBookmarks)
-    } catch {
+    } catch (error) {
       toast({
         title: 'Error',
         description: 'Failed to reorder bookmarks. Please try again.',
         variant: 'destructive',
       })
+      throw error
     }
+  }
+
+  const handleBookmarksUpdate = (updatedBookmarks: Bookmark[]) => {
+    setBookmarks(updatedBookmarks)
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="animate-pulse space-y-3">
-          <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
-          <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+      <div className="space-y-6 animate-fade-in">
+        <div className="space-y-4">
+          <div className="animate-pulse space-y-3">
+            <div className="h-8 bg-muted/50 rounded-lg w-1/3"></div>
+            <div className="h-5 bg-muted/30 rounded w-2/3"></div>
+          </div>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-24 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+              <div className="glass-card h-32 rounded-xl premium-shadow"></div>
             </div>
           ))}
         </div>
@@ -131,21 +139,23 @@ export default function BookmarksPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
-            <BookmarkIcon className="h-6 w-6 text-blue-500" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-semibold text-foreground flex items-center gap-3">
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-primary rounded-xl shadow-premium dark:shadow-premium-dark">
+              <BookmarkIcon className="h-5 w-5 text-primary-foreground" />
+            </div>
             All Bookmarks
           </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Manage and organize your saved links with AI-powered summaries.
+          <p className="text-muted-foreground text-balance max-w-2xl">
+            Manage and organize your saved links with AI-powered summaries and smart categorization.
           </p>
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25"
+          className="h-11 px-6 font-medium button-hover bg-primary hover:bg-primary/90 text-primary-foreground shadow-premium dark:shadow-premium-dark"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Bookmark
@@ -157,6 +167,7 @@ export default function BookmarksPage() {
         bookmarks={bookmarks}
         onDelete={handleDeleteBookmark}
         onReorder={handleReorderBookmarks}
+        onBookmarksUpdate={handleBookmarksUpdate}
       />
 
       {/* Bookmark Modal */}
