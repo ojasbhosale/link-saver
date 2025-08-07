@@ -1,17 +1,17 @@
-// ✅ Force route to use Node.js runtime
+// ✅ Force Node.js runtime (for Supabase)
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { NextApiRequest } from 'next'
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: { id: string } }  // ✅ correct context type
 ) {
-  const { params } = context
-
   try {
-    const supabase = await createClient()
+    const { params } = context
+    const supabase = createClient()
 
     const {
       data: { user },
