@@ -5,11 +5,16 @@ export async function DELETE(
   request: NextRequest,
   context: { params: { id: string } }
 ) {
+  const { params } = context
+
   try {
-    const { params } = context
     const supabase = await createClient()
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
