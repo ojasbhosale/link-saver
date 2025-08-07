@@ -66,24 +66,24 @@ SnipLink is a modern, AI-powered bookmark manager that automatically generates s
 
 ### 1. Clone the repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/yourusername/sniplink.git
 cd sniplink
-\`\`\`
+```
 
 ### 2. Install dependencies
 
-\`\`\`bash
+```bash
 npm install
 # or
 yarn install
-\`\`\`
+```
 
 ### 3. Set up environment variables
 
 Create a `.env.local` file in the root directory:
 
-\`\`\`env
+```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -91,7 +91,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Optional: Google OAuth (for enhanced authentication)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-\`\`\`
+```
 
 ### 4. Set up Supabase
 
@@ -101,17 +101,17 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 ### 5. Run the development server
 
-\`\`\`bash
+```bash
 npm run dev
 # or
 yarn dev
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 🗄️ Database Schema
 
-\`\`\`sql
+```sql
 -- Bookmarks table
 CREATE TABLE bookmarks (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -125,7 +125,7 @@ CREATE TABLE bookmarks (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-\`\`\`
+```
 
 ## 🎯 Usage
 
