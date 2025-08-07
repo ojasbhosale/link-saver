@@ -1,13 +1,13 @@
 # 🔗 SnipLink - AI-Powered Bookmark Manager
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/sniplink)
+
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://sniplink-v1.vercel.app)
 
 > **Save, organize, and summarize your favorite links with AI-powered intelligence.**
 
 SnipLink is a modern, AI-powered bookmark manager that automatically generates summaries for your saved links, making it easy to organize and rediscover your content. Built with Next.js 15, Supabase, and featuring a beautiful glass-morphism UI.
 
-![SnipLink Preview](https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop&crop=center)
+![SnipLink Preview](preview.png)
 
 ## ✨ Features
 
@@ -158,13 +158,13 @@ CREATE TABLE bookmarks (
 
 ### Manual Deployment
 
-\`\`\`bash
+```bash
 # Build the application
 npm run build
 
 # Start production server
 npm start
-\`\`\`
+```
 
 ## 🔧 Configuration
 
@@ -247,7 +247,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Made with ❤️ by [Your Name](https://github.com/yourusername)**
+**Made with ❤️ by [Ojas Bhosale](https://github.com/ojasbhosale)**
 
 [⭐ Star this repo](https://github.com/yourusername/sniplink) • [🐛 Report Bug](https://github.com/yourusername/sniplink/issues) • [✨ Request Feature](https://github.com/yourusername/sniplink/issues)
 
