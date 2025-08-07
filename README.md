@@ -67,7 +67,7 @@ SnipLink is a modern, AI-powered bookmark manager that automatically generates s
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/sniplink.git
+git clone https://github.com/ojasbhosale/sniplink-v1.git
 cd sniplink
 ```
 
@@ -241,8 +241,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Live Demo:** [https://sniplink-v1.vercel.app](https://sniplink-v1.vercel.app)
-- **Issues:** [GitHub Issues](https://github.com/yourusername/sniplink/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/sniplink/discussions)
+- **Issues:** [GitHub Issues](https://github.com/ojasbhosale/sniplink-v1.git/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/ojasbhosale/sniplink-v1.git/discussions)
 
 ---
 
@@ -250,6 +250,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ by [Ojas Bhosale](https://github.com/ojasbhosale)**
 
-[⭐ Star this repo](https://github.com/yourusername/sniplink) • [🐛 Report Bug](https://github.com/yourusername/sniplink/issues) • [✨ Request Feature](https://github.com/yourusername/sniplink/issues)
+[⭐ Star this repo](https://github.com/ojasbhosale/sniplink-v1.git) • [🐛 Report Bug](https://github.com/ojasbhosale/sniplink-v1/issues) • [✨ Request Feature](https://github.com/ojasbhosale/sniplink-v1/issues)
 
 </div>
